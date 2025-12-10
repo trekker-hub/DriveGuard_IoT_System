@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriveGuard - IoT Driver Safety System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            color: rgba(255,255,255,0.9);
+            margin-top: 10px;
+            font-size: 1.2em;
+        }
+        
+        .header .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .nav-tab {
+            padding: 12px 25px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #e0e0e0;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tab:hover {
+            background: rgba(102, 126, 234, 0.5);
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+        }
+        
+        .card h3 {
+            color: #a78bfa;
+            margin: 20px 0 10px 0;
+        }
+        
+        /* Pinout Diagram Styles */
+        .pinout-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .arduino-board {
+            background: #1e3a5f;
+            border-radius: 15px;
+            padding: 20px;
+            width: 300px;
+            border: 3px solid #4a90d9;
+            position: relative;
+        }
+        
+        .board-title {
+            text-align: center;
+            color: #4a90d9;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .pin-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+        }
+        
+        .pin {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85em;
+        }
+        
+        .pin-left {
+            flex-direction: row;
+        }
+        
+        .pin-right {
+            flex-direction: row-reverse;
+        }
+        
+        .pin-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid;
+        }
+        
+        .pin-gps { background: #22c55e; border-color: #16a34a; }
+        .pin-led { background: #ef4444; border-color: #dc2626; }
+        .pin-led-yellow { background: #eab308; border-color: #ca8a04; }
+        .pin-led-green { background: #22c55e; border-color: #16a34a; }
+        .pin-buzzer { background: #8b5cf6; border-color: #7c3aed; }
+        .pin-i2c { background: #3b82f6; border-color: #2563eb; }
+        .pin-power { background: #f97316; border-color: #ea580c; }
+        .pin-gnd { background: #6b7280; border-color: #4b5563; }
+        .pin-unused { background: transparent; border-color: #4b5563; }
+        
+        .connections-list {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .connection-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .connection-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+        
+        .connection-details {
+            flex: 1;
+        }
+        
+        .connection-details strong {
+            display: block;
+            color: #e0e0e0;
+        }
+        
+        .connection-details span {
+            font-size: 0.85em;
+            color: #9ca3af;
+        }
+        
+        /* PCB Styles */
+        .pcb-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .pcb-section {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .pcb-section h4 {
+            color: #a78bfa;
+            margin-bottom: 15px;
+        }
+        
+        .component-list {
+            list-style: none;
+        }
+        
+        .component-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .component-list li:last-child {
+            border-bottom: none;
+        }
+        
+        /* Setup Steps */
+        .setup-steps {
+            counter-reset: step;
+        }
+        
+        .setup-step {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            position: relative;
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-content h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .code-block {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin: 10px 0;
+            border: 1px solid #30363d;
+        }
+        
+        .code-block .comment {
+            color: #8b949e;
+        }
+        
+        .code-block .keyword {
+            color: #ff7b72;
+        }
+        
+        .code-block .string {
+            color: #a5d6ff;
+        }
+        
+        .code-block .value {
+            color: #79c0ff;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            color: #9ca3af;
+            margin-top: 5px;
+        }
+        
+        /* Features */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .feature-card {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 25px;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        /* Scoring Table */
+        .scoring-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .scoring-table th,
+        .scoring-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .scoring-table th {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+        }
+        
+        .scoring-table tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .grade-a { color: #22c55e; }
+        .grade-b { color: #84cc16; }
+        .grade-c { color: #eab308; }
+        .grade-d { color: #f97316; }
+        .grade-f { color: #ef4444; }
+        
+        /* MQTT Topics */
+        .topic-item {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .topic-name {
+            font-family: monospace;
+            color: #a78bfa;
+            font-size: 0.95em;
+        }
+        
+        .topic-desc {
+            color: #9ca3af;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #6b7280;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 30px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .nav-tabs {
+                padding: 10px;
+            }
+            
+            .nav-tab {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .pinout-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚗 DriveGuard</h1>
+        <p>IoT Driver Safety Monitoring System</p>
+        <div class="badge">ECE508 Fall 2025 • George Mason University</div>
+    </div>
+    
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="showTab('overview')">Overview</button>
+        <button class="nav-tab" onclick="showTab('pinout')">Pinout Diagram</button>
+        <button class="nav-tab" onclick="showTab('pcb')">PCB & Components</button>
+        <button class="nav-tab" onclick="showTab('setup')">Setup Guide</button>
+        <button class="nav-tab" onclick="showTab('scoring')">Scoring System</button>
+        <button class="nav-tab" onclick="showTab('mqtt')">MQTT & Data</button>
+    </div>
+    
+    <div class="content">
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">99.7%</div>
+                    <div class="stat-label">Network Reduction</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">60</div>
+                    <div class="stat-label">Buffered Readings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">10min</div>
+                    <div class="stat-label">Batch Interval</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">&lt;1s</div>
+                    <div class="stat-label">Alert Latency</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>🎯 Project Overview</h2>
+                <p style="font-size: 1.1em; line-height: 1.8;">
+                    DriveGuard is a comprehensive IoT driver safety monitoring system that tracks driving behavior in real-time. 
+                    Using GPS tracking, IMU sensors, and cloud connectivity, the system provides immediate feedback on dangerous 
+                    driving events while efficiently managing network resources through intelligent data buffering.
+                </p>
+            </div>
+            
+            <div class="card">
+                <h2>✨ Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📍</div>
+                        <h4>GPS Tracking</h4>
+                        <p>Real-time location and speed monitoring with BN220 GPS module providing accurate positioning data.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h4>Smart Buffering</h4>
+                        <p>60-reading circular buffer reduces network traffic by 99.7% while maintaining data integrity.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h4>Instant Alerts</h4>
+                        <p>Critical safety events bypass the buffer for immediate cloud notification and response.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🏆</div>
+                        <h4>Driver Scoring</h4>
+                        <p>Real-time scoring system grades driving behavior from A to F based on safety metrics.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">☁️</div>
+                        <h4>Cloud Connected</h4>
+                        <p>MQTT connectivity to Shiftr.io enables real-time monitoring from anywhere.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📱</div>
+                        <h4>Web Dashboard</h4>
+                        <p>Beautiful dark-themed dashboard displays live data, charts, and historical sessions.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>🛠️ System Architecture</h2>
+                <div class="code-block">
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│  Arduino Nano   │────▶│   Shiftr.io      │────▶│    Telegraf     │
+│    33 IoT       │MQTT │  Cloud Broker    │     │  Data Collector │
+│                 │     │                  │     │                 │
+│ • GPS Module    │     │ • Topic Routing  │     │ • Line Protocol │
+│ • IMU Sensor    │     │ • Message Queue  │     │ • File Output   │
+│ • OLED Display  │     │                  │     │                 │
+└─────────────────┘     └──────────────────┘     └────────┬────────┘
+                                                          │
+                                                          ▼
+                                                ┌─────────────────┐
+                                                │  Flask Server   │
+                                                │                 │
+                                                │ • REST API      │
+                                                │ • Data Parsing  │
+                                                │ • Web Dashboard │
+                                                └─────────────────┘
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pinout Tab -->
+        <div id="pinout" class="tab-content">
+            <div class="card">
+                <h2>📌 Arduino Nano 33 IoT Pinout</h2>
+                <div class="pinout-container">
+                    <div class="arduino-board">
+                        <div class="board-title">Arduino Nano 33 IoT</div>
+                        
+                        <div class="pin-row">
+                            <div class="pin pin-left">
+                                <span class="pin-dot pin-gps"></span>
+                                <span>D0 (RX) ← GPS TX</span>
+                            </div>
+                            <div class="pin pin-right">
+                                <span class="pin-dot pin-unused"></span>
+                                <span>D13</span>
+                            </div>
+                        </div>
+                        
+                        <div class="pin-row">
+                            <div class="pin pin-left">
+                                <span class="pin-dot pin-gps"></span>
+                                <span>D1 (TX) → GPS RX</span>
+                            </div>
+                            <div class="pin pin-right">
+                                <span class="pin-dot pin-power"></span>
+                                <span>3V3</span>
+                            </div>
+                        </div>
+                        
+                        <div class="pin-row">
+                            <div class="pin pin-left">
+                                <span class="pin-dot pin-led"></span>
+                                <span>D2 → Red LED</span>
+                            </div>
+                            <div class="pin pin-right">
+                                <span class="pin-dot pin-unused"></span>
+                                <span>AREF</span>
+                            </div>
+                        </div>
+                        
+                        <div class="pin-row">
+                            <div class="pin pin-left">
+                                <span class="pin-dot pin-led-yellow"></span>
+                                <span>D3 → Yellow LED</span>
+                            </div>
+                            <div class="pin pin-right">
+                                <span class="pin-dot pin-i2c"></span>
+                                <span>A4 (SDA) ↔ OLED</span>
+                            </div>
+                        </div>
+                        
+                        <div class="pin-row">
+                            <div class="pin pin-left">
+                                <span class="pin-dot pin-led-green"></span>
+                                <span>D4 → Green LED</span>
+                            </div>
+                            <div class="pin pin-right">
+                                <span class="pin-dot pin-i2c"></span>
+                                <span>A5 (SCL) ↔ OLED</span>
+                            </div>
+                        </div>
+                        
+                        <div class="pin-row">
+                            <div class="pin pin-left">
+                                <span class="pin-dot pin-unused"></span>
+                                <span>D5</span>
+                            </div>
+                            <div class="pin pin-right">
+                                <span class="pin-dot pin-unused"></span>
+                                <span>A3</span>
+                            </div>
+                        </div>
+                        
+                        <div class="pin-row">
+                            <div class="pin pin-left">
+                                <span class="pin-dot pin-buzzer"></span>
+                                <span>D6 → Buzzer</span>
+                            </div>
+                            <div class="pin pin-right">
+                                <span class="pin-dot pin-unused"></span>
+                                <span>A2</span>
+                            </div>
+                        </div>
+                        
+                        <div class="pin-row">
+                            <div class="pin pin-left">
+                                <span class="pin-dot pin-led-green"></span>
+                                <span>D7 → GPS OK LED</span>
+                            </div>
+                            <div class="pin pin-right">
+                                <span class="pin-dot pin-unused"></span>
+                                <span>A1</span>
+                            </div>
+                        </div>
+                        
+                        <div class="pin-row">
+                            <div class="pin pin-left">
+                                <span class="pin-dot pin-led"></span>
+                                <span>D8 → GPS Fail LED</span>
+                            </div>
+                            <div class="pin pin-right">
+                                <span class="pin-dot pin-unused"></span>
+                                <span>A0</span>
+                            </div>
+                        </div>
+                        
+                        <div class="pin-row">
+                            <div class="pin pin-left">
+                                <span class="pin-dot pin-unused"></span>
+                                <span>D9</span>
+                            </div>
+                            <div class="pin pin-right">
+                                <span class="pin-dot pin-power"></span>
+                                <span>VIN</span>
+                            </div>
+                        </div>
+                        
+                        <div class="pin-row">
+                            <div class="pin pin-left">
+                                <span class="pin-dot pin-unused"></span>
+                                <span>D10</span>
+                            </div>
+                            <div class="pin pin-right">
+                                <span class="pin-dot pin-gnd"></span>
+                                <span>GND</span>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid #4a90d9;">
+                            <small>USB Port</small>
+                        </div>
+                    </div>
+                    
+                    <div class="connections-list">
+                        <h3 style="margin-bottom: 15px; color: #667eea;">Component Connections</h3>
+                        
+                        <div class="connection-item">
+                            <div class="connection-icon" style="background: #22c55e;">📍</div>
+                            <div class="connection-details">
+                                <strong>BN220 GPS Module</strong>
+                                <span>TX → D0 (RX) | RX → D1 (TX) | VCC → 3.3V | GND → GND</span>
+                            </div>
+                        </div>
+                        
+                        <div class="connection-item">
+                            <div class="connection-icon" style="background: #3b82f6;">📺</div>
+                            <div class="connection-details">
+                                <strong>SSD1306 OLED Display</strong>
+                                <span>SDA → A4 | SCL → A5 | VCC → 3.3V | GND → GND</span>
+                            </div>
+                        </div>
+                        
+                        <div class="connection-item">
+                            <div class="connection-icon" style="background: #ef4444;">🔴</div>
+                            <div class="connection-details">
+                                <strong>Red LED (Danger)</strong>
+                                <span>Anode → D2 (via 220Ω) | Cathode → GND</span>
+                            </div>
+                        </div>
+                        
+                        <div class="connection-item">
+                            <div class="connection-icon" style="background: #eab308;">🟡</div>
+                            <div class="connection-details">
+                                <strong>Yellow LED (Warning)</strong>
+                                <span>Anode → D3 (via 220Ω) | Cathode → GND</span>
+                            </div>
+                        </div>
+                        
+                        <div class="connection-item">
+                            <div class="connection-icon" style="background: #22c55e;">🟢</div>
+                            <div class="connection-details">
+                                <strong>Green LED (Safe)</strong>
+                                <span>Anode → D4 (via 220Ω) | Cathode → GND</span>
+                            </div>
+                        </div>
+                        
+                        <div class="connection-item">
+                            <div class="connection-icon" style="background: #8b5cf6;">🔊</div>
+                            <div class="connection-details">
+                                <strong>Piezo Buzzer</strong>
+                                <span>+ → D6 | - → GND</span>
+                            </div>
+                        </div>
+                        
+                        <div class="connection-item">
+                            <div class="connection-icon" style="background: #22c55e;">✅</div>
+                            <div class="connection-details">
+                                <strong>GPS Status LED (Green)</strong>
+                                <span>Anode → D7 (via 220Ω) | Cathode → GND</span>
+                            </div>
+                        </div>
+                        
+                        <div class="connection-item">
+                            <div class="connection-icon" style="background: #ef4444;">❌</div>
+                            <div class="connection-details">
+                                <strong>GPS Status LED (Red)</strong>
+                                <span>Anode → D8 (via 220Ω) | Cathode → GND</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>⚠️ Important Notes</h2>
+                <ul style="line-height: 2; padding-left: 20px;">
+                    <li><strong>GPS Module Voltage:</strong> BN220 runs on 3.3V - do NOT connect to 5V!</li>
+                    <li><strong>LED Resistors:</strong> Use 220Ω resistors for all LEDs to limit current</li>
+                    <li><strong>I2C Pull-ups:</strong> The Nano 33 IoT has internal pull-ups for I2C (A4/A5)</li>
+                    <li><strong>Serial Conflict:</strong> D0/D1 are shared with USB - disconnect GPS when uploading code</li>
+                    <li><strong>IMU Built-in:</strong> The LSM6DS3 IMU is built into the Nano 33 IoT - no wiring needed</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- PCB Tab -->
+        <div id="pcb" class="tab-content">
+            <div class="card">
+                <h2>🔧 PCB Design & Components</h2>
+                <div class="pcb-layout">
+                    <div class="pcb-section">
+                        <h4>📋 Bill of Materials</h4>
+                        <ul class="component-list">
+                            <li><span>Arduino Nano 33 IoT</span><span>×1</span></li>
+                            <li><span>BN220 GPS Module</span><span>×1</span></li>
+                            <li><span>SSD1306 OLED 128×64</span><span>×1</span></li>
+                            <li><span>Red LED 5mm</span><span>×2</span></li>
+                            <li><span>Yellow LED 5mm</span><span>×1</span></li>
+                            <li><span>Green LED 5mm</span><span>×2</span></li>
+                            <li><span>220Ω Resistor</span><span>×5</span></li>
+                            <li><span>Piezo Buzzer</span><span>×1</span></li>
+                            <li><span>Header Pins (Male)</span><span>30 pins</span></li>
+                            <li><span>Header Pins (Female)</span><span>30 pins</span></li>
+                            <li><span>Perfboard/PCB</span><span>70×90mm</span></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="pcb-section">
+                        <h4>🔌 Power Requirements</h4>
+                        <ul class="component-list">
+                            <li><span>Input Voltage</span><span>5V USB</span></li>
+                            <li><span>Logic Level</span><span>3.3V</span></li>
+                            <li><span>GPS Module</span><span>3.3V @ 50mA</span></li>
+                            <li><span>OLED Display</span><span>3.3V @ 20mA</span></li>
+                            <li><span>LEDs (each)</span><span>3.3V @ 10mA</span></li>
+                            <li><span>Total Current</span><span>~150mA</span></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="pcb-section">
+                        <h4>📐 PCB Layout Tips</h4>
+                        <ul style="line-height: 1.8; padding-left: 20px;">
+                            <li>Place Arduino in center with headers</li>
+                            <li>GPS module on edge for antenna clearance</li>
+                            <li>OLED on top for visibility</li>
+                            <li>LEDs in a row for status indication</li>
+                            <li>Keep I2C traces short</li>
+                            <li>Add decoupling caps near GPS</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="pcb-section">
+                        <h4>🛡️ ESD Protection</h4>
+                        <ul style="line-height: 1.8; padding-left: 20px;">
+                            <li>Add 100nF caps on power rails</li>
+                            <li>Ground plane recommended</li>
+                            <li>Keep GPS antenna away from noise</li>
+                            <li>Use shielded enclosure if mobile</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>📏 Suggested PCB Dimensions</h2>
+                <div class="code-block">
+┌────────────────────────────────────────────────────────────────┐
+│                         90mm                                   │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                                                          │  │
+│  │   [GPS Module]          [OLED Display 128x64]           │  │
+│  │   BN220                                                  │  │
+│  │                                                          │  │ 70mm
+│  │         ┌─────────────────────────┐                      │  │
+│  │         │   Arduino Nano 33 IoT   │                      │  │
+│  │         └─────────────────────────┘                      │  │
+│  │                                                          │  │
+│  │   🔴 🟡 🟢          [Buzzer]          🟢 🔴              │  │
+│  │   Status LEDs                        GPS LEDs            │  │
+│  │                                                          │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────────┘
+                </div>
+            </div>
+        </div>
+        
+        <!-- Setup Tab -->
+        <div id="setup" class="tab-content">
+            <div class="card">
+                <h2>🚀 Quick Start Guide</h2>
+                
+                <div class="setup-steps">
+                    <div class="setup-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Edit Configuration</h4>
+                            <p>Open <code>config.py</code> and update your settings:</p>
+                            <div class="code-block">
+<span class="comment"># config.py - Edit these values</span>
+WIFI_SSID = <span class="string">"YourWiFiName"</span>
+WIFI_PASSWORD = <span class="string">"YourWiFiPassword"</span>
+G_NUMBER = <span class="string">"G01234567"</span>
+
+<span class="comment"># Thresholds</span>
+SPEED_DANGER = <span class="value">120.0</span>  <span class="comment"># km/h</span>
+ACCEL_HARSH = <span class="value">0.5</span>    <span class="comment"># g</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setup-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Update Arduino Code</h4>
+                            <p>Run the update command to sync config with Arduino:</p>
+                            <div class="code-block">
+python run.py --update
+                            </div>
+                            <p style="margin-top: 10px; color: #9ca3af;">This automatically updates the .ino file with your settings.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="setup-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Upload to Arduino</h4>
+                            <p>Open Arduino IDE and upload the code:</p>
+                            <ul style="line-height: 2; padding-left: 20px; margin-top: 10px;">
+                                <li>Open <code>arduino/DriveGuard_Shiftr_Production/DriveGuard_Shiftr_Production.ino</code></li>
+                                <li>Select Board: <strong>Arduino Nano 33 IoT</strong></li>
+                                <li>Select Port: <strong>COMx</strong> (your Arduino port)</li>
+                                <li>Click <strong>Upload</strong> ▶️</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="setup-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Install Telegraf</h4>
+                            <p>Download and place telegraf.exe in the telegraf folder:</p>
+                            <div class="code-block">
+DriveGuard_Final/
+└── telegraf/
+    └── telegraf.exe  <span class="comment">← Place here</span>
+                            </div>
+                            <p style="margin-top: 10px;">Download from: <a href="https://portal.influxdata.com/downloads/" style="color: #667eea;">portal.influxdata.com/downloads</a></p>
+                        </div>
+                    </div>
+                    
+                    <div class="setup-step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h4>Start the System</h4>
+                            <p>Run the main launcher:</p>
+                            <div class="code-block">
+python run.py
+                            </div>
+                            <p style="margin-top: 10px; color: #9ca3af;">This starts Telegraf + Flask dashboard and opens your browser automatically!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>📚 Required Arduino Libraries</h2>
+                <p style="margin-bottom: 15px;">Install these via Arduino IDE Library Manager (Sketch → Include Library → Manage Libraries):</p>
+                <ul class="component-list">
+                    <li><span>WiFiNINA</span><span>by Arduino</span></li>
+                    <li><span>Arduino_LSM6DS3</span><span>by Arduino</span></li>
+                    <li><span>PubSubClient</span><span>by Nick O'Leary</span></li>
+                    <li><span>Adafruit SSD1306</span><span>by Adafruit</span></li>
+                    <li><span>Adafruit GFX Library</span><span>by Adafruit</span></li>
+                    <li><span>SSD1306Ascii</span><span>by Bill Greiman</span></li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h2>🔧 Command Reference</h2>
+                <div class="code-block">
+<span class="comment"># Start full system (Telegraf + Dashboard)</span>
+python run.py
+
+<span class="comment"># Update Arduino code with config.py settings</span>
+python run.py --update
+
+<span class="comment"># Run dashboard only (no Telegraf)</span>
+python run.py --dashboard
+
+<span class="comment"># Show help</span>
+python run.py --help
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scoring Tab -->
+        <div id="scoring" class="tab-content">
+            <div class="card">
+                <h2>🏆 Driver Scoring System</h2>
+                <p style="margin-bottom: 20px;">DriveGuard uses a points-based system to evaluate driving behavior in real-time.</p>
+                
+                <h3>Starting Score</h3>
+                <p>Every driver starts with <strong style="color: #22c55e; font-size: 1.5em;">100 points</strong> (Grade A)</p>
+                
+                <h3 style="margin-top: 25px;">Point Deductions</h3>
+                <table class="scoring-table">
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Threshold</th>
+                            <th>Points</th>
+                            <th>Alert</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>⚡ Speeding</td>
+                            <td>&gt; 120 km/h</td>
+                            <td style="color: #ef4444;">-5 points</td>
+                            <td>Immediate</td>
+                        </tr>
+                        <tr>
+                            <td>💥 Harsh Acceleration</td>
+                            <td>&gt; 0.5g</td>
+                            <td style="color: #ef4444;">-3 points</td>
+                            <td>Immediate</td>
+                        </tr>
+                        <tr>
+                            <td>🛑 Hard Braking</td>
+                            <td>&gt; 0.5g decel</td>
+                            <td style="color: #ef4444;">-3 points</td>
+                            <td>Immediate</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3 style="margin-top: 25px;">Point Bonuses</h3>
+                <table class="scoring-table">
+                    <thead>
+                        <tr>
+                            <th>Achievement</th>
+                            <th>Condition</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>🌟 Smooth Driving</td>
+                            <td>10 minutes without violations</td>
+                            <td style="color: #22c55e;">+1 point</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3 style="margin-top: 25px;">Grade Scale</h3>
+                <table class="scoring-table">
+                    <thead>
+                        <tr>
+                            <th>Grade</th>
+                            <th>Score Range</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="grade-a" style="font-size: 1.5em; font-weight: bold;">A</td>
+                            <td>90 - 100</td>
+                            <td>🟢 Excellent Driver</td>
+                        </tr>
+                        <tr>
+                            <td class="grade-b" style="font-size: 1.5em; font-weight: bold;">B</td>
+                            <td>80 - 89</td>
+                            <td>🟢 Good Driver</td>
+                        </tr>
+                        <tr>
+                            <td class="grade-c" style="font-size: 1.5em; font-weight: bold;">C</td>
+                            <td>70 - 79</td>
+                            <td>🟡 Average Driver</td>
+                        </tr>
+                        <tr>
+                            <td class="grade-d" style="font-size: 1.5em; font-weight: bold;">D</td>
+                            <td>60 - 69</td>
+                            <td>🟠 Below Average</td>
+                        </tr>
+                        <tr>
+                            <td class="grade-f" style="font-size: 1.5em; font-weight: bold;">F</td>
+                            <td>0 - 59</td>
+                            <td>🔴 Poor Driver</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="card">
+                <h2>💡 LED Indicators</h2>
+                <div class="features-grid">
+                    <div class="feature-card" style="border-left: 4px solid #22c55e;">
+                        <h4>🟢 Green LED (D4)</h4>
+                        <p>Solid = Safe driving<br>Score ≥ 80 points</p>
+                    </div>
+                    <div class="feature-card" style="border-left: 4px solid #eab308;">
+                        <h4>🟡 Yellow LED (D3)</h4>
+                        <p>Solid = Caution<br>Score 60-79 points</p>
+                    </div>
+                    <div class="feature-card" style="border-left: 4px solid #ef4444;">
+                        <h4>🔴 Red LED (D2)</h4>
+                        <p>Blinking = Danger!<br>Score &lt; 60 or active violation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MQTT Tab -->
+        <div id="mqtt" class="tab-content">
+            <div class="card">
+                <h2>☁️ MQTT Topics</h2>
+                <p style="margin-bottom: 20px;">All data is published to Shiftr.io using the following topic structure:</p>
+                
+                <div class="topic-item">
+                    <div class="topic-name">ece508/team4/{G_NUMBER}/driveguard/batch_data</div>
+                    <div class="topic-desc">Batched sensor readings (every 10 minutes, 60 readings)</div>
+                </div>
+                
+                <div class="topic-item">
+                    <div class="topic-name">ece508/team4/{G_NUMBER}/driveguard/alert_speed</div>
+                    <div class="topic-desc">Immediate speeding alerts (bypasses buffer)</div>
+                </div>
+                
+                <div class="topic-item">
+                    <div class="topic-name">ece508/team4/{G_NUMBER}/driveguard/alert_harsh</div>
+                    <div class="topic-desc">Immediate harsh driving alerts (bypasses buffer)</div>
+                </div>
+                
+                <div class="topic-item">
+                    <div class="topic-name">ece508/team4/{G_NUMBER}/driveguard/status</div>
+                    <div class="topic-desc">System status messages (boot, WiFi, MQTT connection)</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>📊 Data Formats</h2>
+                
+                <h3>Batch Data Payload</h3>
+                <div class="code-block">
+{
+  "ts": 1234567890,      <span class="comment">// Timestamp (epoch seconds)</span>
+  "spd": 85.3,           <span class="comment">// Speed in km/h</span>
+  "lat": 38.8977,        <span class="comment">// GPS Latitude</span>
+  "lon": -77.0365,       <span class="comment">// GPS Longitude</span>
+  "acc": 0.23,           <span class="comment">// Acceleration magnitude (g)</span>
+  "scr": 94,             <span class="comment">// Current driving score</span>
+  "gps": 1               <span class="comment">// GPS valid flag (0/1)</span>
+}
+                </div>
+                
+                <h3>Speed Alert Payload</h3>
+                <div class="code-block">
+{
+  "ts": 1234567890,      <span class="comment">// Timestamp</span>
+  "spd": 135.2,          <span class="comment">// Current speed</span>
+  "lim": 120.0,          <span class="comment">// Speed limit threshold</span>
+  "scr": 89,             <span class="comment">// Score after penalty</span>
+  "lat": 38.8977,        <span class="comment">// Location latitude</span>
+  "lon": -77.0365        <span class="comment">// Location longitude</span>
+}
+                </div>
+                
+                <h3>Harsh Driving Alert Payload</h3>
+                <div class="code-block">
+{
+  "ts": 1234567890,      <span class="comment">// Timestamp</span>
+  "acc": 0.67,           <span class="comment">// Acceleration that triggered alert</span>
+  "thr": 0.5,            <span class="comment">// Threshold setting</span>
+  "scr": 91              <span class="comment">// Score after penalty</span>
+}
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>📈 Network Efficiency</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">360</div>
+                        <div class="stat-label">Readings/Hour (Raw)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">6</div>
+                        <div class="stat-label">Messages/Hour (Batched)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">99.7%</div>
+                        <div class="stat-label">Traffic Reduction</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">~900</div>
+                        <div class="stat-label">Bytes per Batch</div>
+                    </div>
+                </div>
+                
+                <h3>Buffering Strategy</h3>
+                <ul style="line-height: 2; padding-left: 20px;">
+                    <li><strong>Buffer Size:</strong> 60 readings (circular buffer)</li>
+                    <li><strong>Sample Rate:</strong> Every 10 seconds</li>
+                    <li><strong>Batch Interval:</strong> Every 10 minutes</li>
+                    <li><strong>Alert Bypass:</strong> Critical events skip buffer for immediate transmission</li>
+                    <li><strong>Memory Safety:</strong> Circular buffer prevents overflow</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>DriveGuard IoT Driver Safety System</p>
+        <p>ECE508 Internet of Things • Fall 2025 • George Mason University</p>
+        <p style="margin-top: 10px; color: #4b5563;">Built with Arduino Nano 33 IoT • Shiftr.io • Flask</p>
+    </div>
+    
+    <script>
+        function showTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active from all nav tabs
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active to clicked button
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
