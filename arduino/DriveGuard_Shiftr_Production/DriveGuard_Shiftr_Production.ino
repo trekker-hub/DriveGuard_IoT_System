@@ -1,6 +1,6 @@
 /**************************************************************************
 Class: ECE508 Fall 2025
-Student Name: Tarek
+Student Name: Tariq
 Gnumber: Gxxxx6647
 Date: December 2025
 Project: DriveGuard Final Project - Shiftr.io Production Version
@@ -32,6 +32,18 @@ MQTT Topics (for professor to subscribe):
 - ece508/team4/Gxxxx6647/driveguard/alert_speed
 - ece508/team4/Gxxxx6647/driveguard/alert_harsh
 - ece508/team4/Gxxxx6647/driveguard/status
+
+LLM prompt used:
+"I need to build an IoT driver safety monitoring system for my ECE508 final 
+project using Arduino Nano 33 IoT. The system should:
+- Read GPS data from BN220 module
+- Use the built-in LSM6DS3 IMU for acceleration/gyroscope
+- Display real-time data on SSD1306 OLED
+- Connect to Shiftr.io MQTT broker (topic: ece508/team4/Gxxxx6647/driveguard/#)
+- Calculate safety scores based on speeding and harsh acceleration
+- Include data buffering to reduce network traffic (project requirement)
+- Sound buzzer alerts for safety violations
+- Show GPS status with LEDs on pins D7/D8"
 
 Issues: None
 **************************************************************************/

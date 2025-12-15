@@ -1,3 +1,16 @@
+# LLM Prompt:
+# "Create a Flask web application for DriveGuard that:
+# - Serves as the main web interface for the project
+# - Connects to Shiftr.io MQTT broker to receive real-time data
+# - Displays live driving metrics (speed, acceleration, GPS coordinates)
+# - Shows current safety score with color-coded status (green >80, yellow 60-80, red <60)
+# - Implements WebSocket or Server-Sent Events for real-time updates
+# - Has a clean, modern dashboard layout
+# - Displays historical data trends with charts
+# - Shows system status (MQTT connection, last update time)
+# - Uses Bootstrap or similar framework for responsive design
+# - Runs on port 5000 for local development"
+
 """
 DriveGuard Dashboard - Flask Backend
 Reads Telegraf output and serves data to the web interface.

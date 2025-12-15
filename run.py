@@ -1,7 +1,20 @@
+# Prompt:
+# "Create a Flask web dashboard for DriveGuard that:
+# - Subscribes to MQTT topics from Shiftr.io
+# - Displays real-time driving data (speed, acceleration, location)
+# - Shows safety score with color coding (green/yellow/red)
+# - Creates graphs for speed and acceleration over time
+# - Shows GPS coordinates on an embedded map"
+# - Updates in real-time as new data arrives
+# - Uses the configuration from config.py
+# - Has a clean, professional interface
+# - Runs on localhost:5000"
+
+
 """
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║                     DRIVEGUARD - MAIN LAUNCHER                                ║
-║                     Run this file to start everything                         ║
+║                     DRIVEGUARD - MAIN LAUNCHER                               ║
+║                     Run this file to start everything                        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 Usage:
@@ -47,12 +60,12 @@ def print_banner():
     print()
     print("╔══════════════════════════════════════════════════════════════════╗")
     print("║                                                                  ║")
-    print("║     ██████╗ ██████╗ ██╗██╗   ██╗███████╗ ██████╗ ██╗   ██╗      ║")
-    print("║     ██╔══██╗██╔══██╗██║██║   ██║██╔════╝██╔════╝ ██║   ██║      ║")
-    print("║     ██║  ██║██████╔╝██║██║   ██║█████╗  ██║  ███╗██║   ██║      ║")
-    print("║     ██║  ██║██╔══██╗██║╚██╗ ██╔╝██╔══╝  ██║   ██║██║   ██║      ║")
-    print("║     ██████╔╝██║  ██║██║ ╚████╔╝ ███████╗╚██████╔╝╚██████╔╝      ║")
-    print("║     ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝  ╚══════╝ ╚═════╝  ╚═════╝       ║")
+    print("║     ██████╗ ██████╗ ██╗██╗   ██╗███████╗ ██████╗ ██╗   ██╗       ║")
+    print("║     ██╔══██╗██╔══██╗██║██║   ██║██╔════╝██╔════╝ ██║   ██║       ║")
+    print("║     ██║  ██║██████╔╝██║██║   ██║█████╗  ██║  ███╗██║   ██║       ║")
+    print("║     ██║  ██║██╔══██╗██║╚██╗ ██╔╝██╔══╝  ██║   ██║██║   ██║       ║")
+    print("║     ██████╔╝██║  ██║██║ ╚████╔╝ ███████╗╚██████╔╝╚██████╔╝       ║")
+    print("║     ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝  ╚══════╝ ╚═════╝  ╚═════╝        ║")
     print("║                                                                  ║")
     print("║              IoT Driver Safety Monitoring System                 ║")
     print("║                      ECE508 Fall 2025                            ║")

@@ -1,7 +1,17 @@
+# LLM Prompt:
+# "Create a Python configuration file for the DriveGuard web dashboard that:
+# - Stores WiFi credentials
+# - Contains Shiftr.io MQTT broker settings (host, port, username, password)
+# - Defines MQTT topics for the system
+# - Uses the topic structure: ece508/team4/Gxxxx6647/driveguard/#
+# - Is easy for users to edit with clear comments"
+#
+#
+
 """
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║                     DRIVEGUARD CONFIGURATION                                  ║
-║                     Edit your settings below                                  ║
+║                     DRIVEGUARD CONFIGURATION                                 ║
+║                     Edit your settings below                                 ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
