@@ -203,5 +203,7 @@ MIT License - ECE508 Fall 2025
 ## 👤 Author - ECE508 IoT Final Project
 
 **Tariq Aldalou** 
+
 **Rami Elassadi**
+
 **Mehdi Messouak**
